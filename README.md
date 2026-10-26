@@ -1,6 +1,6 @@
 # Konzeptstudio – Der rote Faden
 
-Deutschsprachiges Browsertool zur Entwicklung eines Konzepts für eine Maturarbeit oder selbständige Arbeit. Ohne Build-Schritt, externe Bibliotheken, API-Schlüssel oder Backend.
+Deutschsprachiges Browsertool zur Entwicklung eines Konzepts für eine Maturarbeit oder selbständige Arbeit. Ohne Build-Schritt, API-Schlüssel oder Backend. Die Word-Bibliothek wird lokal mitgeliefert; es gibt keine CDN-Abhängigkeit.
 
 ## Starten
 
@@ -46,3 +46,25 @@ MIT für den neu erstellten Anwendungscode. Die erwähnten Vorlagen sind davon a
 ## Konzeptlayout
 
 Vorschau, Druck/PDF und Markdown folgen der bereitgestellten Word-Vorlage: Arbeitstitel, Ausgangslage und Motivation, Fragestellung und Ziel, Themeneingrenzung, Vorgehensweise und Methoden, vorläufige Gliederung und vorläufiger Zeitplan. Allgemeine Angaben, Literatur/Recherche sowie Arbeitsorganisation ergänzen den Aufbau. Die Druckansicht nutzt A4, einen blauen Haupttitel, graue Abschnittstitel und Serifenschrift. Es werden nur Gliederung und Layout übernommen; persönliche Inhalte der Vorlage sind nicht Teil des Repositorys. Bestehende Eingaben bleiben kompatibel.
+
+## Word-Download und Konsistenzcheck
+
+Unter **Konzept ansehen → Word (.docx)** wird eine echte, bearbeitbare DOCX-Datei mit allen Konzeptfeldern und dem aktuellen Zeitplan direkt im Browser erzeugt. Die lokal enthaltene Bibliothek `docx` 9.6.1 liegt unter `dist/vendor/` (MIT, Lizenzdatei beigefügt); zur Laufzeit sind weder Installation noch externe Aufrufe nötig. Cambria/Georgia mit A4, blauem Titel und grauen Abschnittsüberschriften orientieren sich an der Word-Vorlage.
+
+**Konsistenz prüfen** ist über den Kopfbereich, den Fragencheck und die Konzeptansicht erreichbar. Die Kriterien orientieren sich am [Argumentationsprüfer](https://patrickfischerksa.github.io/argumentationspruefer/) ([Quellcode](https://github.com/PatrickFischerKSA/argumentationspruefer)) und sind für Forschungskonzepte neu umgesetzt:
+
+- Annahme bzw. exploratives Ziel, Belege/Gegenbefunde und Schlussregel.
+- Passung von Forschungsfrage, Methode, Material und Auswertung; Zuordnung jeder Teilfrage.
+- Gegenargumente, Alternativerklärungen und Geltungsbereich.
+- Vorschnelle Kausalbehauptungen, Verallgemeinerungen und mögliche Konflikte zwischen Eingrenzung und Methode.
+- Quellenfunktion, bibliografische Lücken, Diskussionsabschnitt und sprachliche Präzision.
+
+Jeder automatische Hinweis nennt die auslösende Regel, wo vorhanden eine Textstelle, einen nächsten Schritt und einen Link zum betroffenen Feld. Fehlende Angaben sind von erkannten Mustern getrennt. Sechs fachliche Prüffragen ergänzen den Bericht; eigene Überlegungen werden im Feld **Reflexion der Konsistenz** gespeichert und mit exportiert. Prioritäten sind Arbeitshinweise, keine Qualitätsnote. Der Check prüft keine Quellen im Internet und kann keine semantischen Widersprüche zuverlässig erkennen oder logische Gültigkeit beweisen. Vorhandene Angaben gelten nicht automatisch als korrekt. Auch das Ausbleiben von Hinweisen ist keine Freigabe.
+
+Die serverseitigen KI- und LanguageTool-Funktionen des Argumentationsprüfers werden nicht eingebunden. Die Anwendung nutzt ausschliesslich lokale Regeln und benötigt kein Backend, keine API-Keys und keine Datenübertragung. Offline nutzbar, wenn die Projektdateien bereits lokal vorliegen; kein Service-Worker-Cache für besuchte Websites zugesichert.
+
+## Regressionstests
+
+`node tests/checks.cjs`
+
+Prüft gezielte Konsistenzregeln und Gegenfälle, Terminplanung, HTML-Escaping, lokale Speicherung und die vollständige Feldübernahme in Markdown und Word-Modell. GitHub Actions führt die Tests vor jeder Pages-Veröffentlichung aus. Der Word-Export wurde zusätzlich als DOCX erzeugt und visuell gerendert geprüft.

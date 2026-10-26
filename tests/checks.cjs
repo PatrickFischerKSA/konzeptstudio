@@ -1,0 +1,30 @@
+const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/strict');
+const nodes=new Map(),el=k=>{if(!nodes.has(k))nodes.set(k,{innerHTML:'',textContent:'',style:{},classList:{toggle(){}},setAttribute(){},addEventListener(){},insertAdjacentHTML(){},showModal(){this.open=true},close(){this.open=false}});return nodes.get(k)};
+const context={console,Date,JSON,Number,String,Array,Object,Math,RegExp,Blob,URL,setTimeout(){},localStorage:{getItem(){return null},setItem(k,v){this.last=v}},document:{querySelector:el,querySelectorAll(){return[]},addEventListener(){},createElement(){return{click(){}}}},window:null,confirm(){return true}};context.window=context;
+vm.createContext(context);for(const file of ['dist/consistency.js','dist/word-export.js','dist/app.js'])vm.runInContext(fs.readFileSync(file,'utf8'),context);
+const api=context.KonzeptConsistency;
+const ids=d=>api.analyze(d,[]).map(x=>x.id);
+assert(ids({}).includes('missing-question'));
+assert(ids({question:'Welchen Einfluss verursacht X auf Y?',method:'Qualitative Interviews'}).includes('causal'));
+assert(!ids({question:'Welche Gründe nennen Verantwortliche?',method:'Qualitative Interviews'}).includes('causal'));
+assert(ids({goal:'Ich will beweisen, dass alle immer X tun.'}).includes('confirmation'));
+assert(ids({goal:'Ich will beweisen, dass alle immer X tun.'}).includes('generalization'));
+assert(ids({scope:'Keine Interviews mit Verantwortlichen.',method:'Qualitative Interviews'}).includes('scope-method'));
+assert(ids({literature:'Noch keine Literatur erfasst.'}).includes('bibliography'));
+assert(!ids({literature:'Muster, A. (2024). Titel. Verlag.'}).includes('bibliography'));
+assert(ids({hypothesis:'X ist grösser als Y.'}).includes('testability'));
+assert(!ids({analysis:'Aussagen immer mit Seitenangabe belegen.'}).includes('generalization'));
+assert.equal(api.questions.length,6);
+vm.runInContext(`
+for(const days of [6,7,14,30,120,365]){state.data.start='2026-10-26';state.data.deadline=iso(dateNum(state.data.start)+days*86400000);generatePlan();if(state.tasks.length!==7||planWarnings().length)throw Error('Invalid plan');}
+const allFields=steps.flatMap(s=>s[3]).map(f=>f[0]);for(const key of allFields)state.data[key]='TEST_'+key;
+const sections=conceptSections(),exportKeys=sections.flatMap(s=>s.fields.map(f=>f[0]));
+if(new Set(exportKeys).size!==exportKeys.length)throw Error('Duplicate exported field');
+for(const key of allFields)if(!exportKeys.includes(key))throw Error('Field missing from export: '+key);
+for(const key of allFields)if(!content().includes('TEST_'+key)||!JSON.stringify(wordModel()).includes('TEST_'+key))throw Error('Export loses '+key);
+state.data.title='<script>alert(1)</script>';preview();if(document.querySelector('#document').innerHTML.includes('<script>'))throw Error('Unsafe HTML');
+state.data.question='<img src=x onerror=alert(1)> verursacht immer X?';review();if(document.querySelector('#reviewContent').innerHTML.includes('<img'))throw Error('Unsafe review HTML');
+save();if(!JSON.parse(localStorage.last).data.title)throw Error('Save failed');
+`,context);
+console.log('PASS: targeted consistency rules, no false causality for reported reasons, six manual checks, schedule regression, export parity for every form field, HTML escaping and persistence.');
+module.exports={context,vm};
