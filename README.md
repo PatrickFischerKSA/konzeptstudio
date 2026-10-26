@@ -42,3 +42,7 @@ Orientierung an den vom Auftraggeber bereitgestellten Scans «Der rote Faden I»
 ## Lizenz
 
 MIT für den neu erstellten Anwendungscode. Die erwähnten Vorlagen sind davon ausgenommen.
+
+## Konzeptlayout
+
+Vorschau, Druck/PDF und Markdown folgen der bereitgestellten Word-Vorlage: Arbeitstitel, Ausgangslage und Motivation, Fragestellung und Ziel, Themeneingrenzung, Vorgehensweise und Methoden, vorläufige Gliederung und vorläufiger Zeitplan. Allgemeine Angaben, Literatur/Recherche sowie Arbeitsorganisation ergänzen den Aufbau. Die Druckansicht nutzt A4, einen blauen Haupttitel, graue Abschnittstitel und Serifenschrift. Es werden nur Gliederung und Layout übernommen; persönliche Inhalte der Vorlage sind nicht Teil des Repositorys. Bestehende Eingaben bleiben kompatibel.
