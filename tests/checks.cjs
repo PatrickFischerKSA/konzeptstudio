@@ -10,13 +10,38 @@ assert(!ids({question:'Welche Gründe nennen Verantwortliche?',method:'Qualitati
 assert(ids({goal:'Ich will beweisen, dass alle immer X tun.'}).includes('confirmation'));
 assert(ids({goal:'Ich will beweisen, dass alle immer X tun.'}).includes('generalization'));
 assert(ids({scope:'Keine Interviews mit Verantwortlichen.',method:'Qualitative Interviews'}).includes('scope-method'));
-assert(ids({literature:'Noch keine Literatur erfasst.'}).includes('bibliography'));
+assert(ids({literature:'Noch keine Literatur erfasst.'}).includes('placeholder-literature'));
+assert(!ids({literature:'Noch keine Literatur erfasst.'}).includes('bibliography'));
 assert(!ids({literature:'Muster, A. (2024). Titel. Verlag.'}).includes('bibliography'));
 assert(ids({hypothesis:'X ist grösser als Y.'}).includes('testability'));
 assert(!ids({analysis:'Aussagen immer mit Seitenangabe belegen.'}).includes('generalization'));
 assert.equal(api.questions.length,6);
+const status=(data,key,tasks=[])=>api.completeness(data,tasks).find(x=>x.key===key).status;
+assert.equal(status({},'name'),'missing');
+assert.equal(status({name:'   '},'name'),'missing');
+assert.equal(status({title:'TODO'},'title'),'placeholder');
+assert.equal(status({name:'Beispiel – eigene Angaben einsetzen'},'name'),'placeholder');
+assert.equal(status({analysis:'Vergleichen.'},'analysis'),'brief');
+assert.equal(status({hours:'0'},'hours'),'invalid');
+assert.equal(status({hours:'200'},'hours'),'invalid');
+assert.equal(status({start:'2026-02-31'},'start'),'invalid');
+assert.equal(status({start:'2026-10-27'},'start'),'present');
+assert.equal(status({},'hypothesis'),'optional');
+assert(!ids({}).includes('missing-hypothesis'));
+assert(!ids({}).includes('missing-reflection'));
+assert.equal(status({},'_schedule'),'missing');
+assert.equal(status({},'_schedule',[{name:'Phase'}]),'present');
+assert(ids({question:'Wie?',material:'Texte'}).includes('brief-material'));
+assert(ids({method:'Qualitative Interviews',material:'Die Auswahl erfolgt gezielt nach Tätigkeitsbereich und Erfahrung in der Leitung.'}).includes('sample-size'));
+assert(!ids({method:'Qualitative Interviews',material:'Fünf Verantwortliche, gezielt nach Berufserfahrung und Tätigkeitsbereich ausgewählt.'}).includes('sample-size'));
+assert(ids({subquestions:'Frage eins?\nFrage zwei?',alignment:'Teilfrage | Material | Methode | Auswertung'}).includes('alignment-coverage'));
+assert(ids({outline:'Einleitung\nGrundlagen\nFazit'}).includes('outline-method'));
+assert(!ids({outline:'Einleitung\nMethode\nAnalyse\nDiskussion\nFazit'}).includes('outline-method'));
+assert(!ids({material:'Keine vollständige Geschichte, sondern gezielte Auswahl aller Texte.'}).includes('placeholder-material'));
+
 vm.runInContext(`
-for(const days of [6,7,14,30,120,365]){state.data.start='2026-10-26';state.data.deadline=iso(dateNum(state.data.start)+days*86400000);generatePlan();if(state.tasks.length!==7||planWarnings().length)throw Error('Invalid plan');}
+for(const days of [6,7,14,30,120,365]){state.data.start=today();state.data.deadline=iso(dateNum(state.data.start)+days*86400000);generatePlan();if(state.tasks.length!==7||planWarnings().length)throw Error('Invalid plan');}
+const schemaKeys=KonzeptConsistency.elements.map(x=>x[0]);for(const s of steps)for(const f of s[3])if(!schemaKeys.includes(f[0]))throw Error('Feedback schema misses '+f[0]);
 const allFields=steps.flatMap(s=>s[3]).map(f=>f[0]);for(const key of allFields)state.data[key]='TEST_'+key;
 const sections=conceptSections(),exportKeys=sections.flatMap(s=>s.fields.map(f=>f[0]));
 if(new Set(exportKeys).size!==exportKeys.length)throw Error('Duplicate exported field');
@@ -24,7 +49,9 @@ for(const key of allFields)if(!exportKeys.includes(key))throw Error('Field missi
 for(const key of allFields)if(!content().includes('TEST_'+key)||!JSON.stringify(wordModel()).includes('TEST_'+key))throw Error('Export loses '+key);
 state.data.title='<script>alert(1)</script>';preview();if(document.querySelector('#document').innerHTML.includes('<script>'))throw Error('Unsafe HTML');
 state.data.question='<img src=x onerror=alert(1)> verursacht immer X?';review();if(document.querySelector('#reviewContent').innerHTML.includes('<img'))throw Error('Unsafe review HTML');
+review('missing');if(!document.querySelector('#reviewContent').innerHTML.includes('Fehlende Angaben'))throw Error('Missing filter');
+if(!feedbackText().includes('CHECKLISTE'))throw Error('Feedback export');
 save();if(!JSON.parse(localStorage.last).data.title)throw Error('Save failed');
 `,context);
-console.log('PASS: targeted consistency rules, no false causality for reported reasons, six manual checks, schedule regression, export parity for every form field, HTML escaping and persistence.');
+console.log('PASS: completeness of every field, optional fields, placeholders, short entries, invalid hours/dates, missing plan components, targeted consistency checks, schedule regression, export parity, escaping and persistence.');
 module.exports={context,vm};

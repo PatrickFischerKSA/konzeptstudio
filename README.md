@@ -68,3 +68,9 @@ Die serverseitigen KI- und LanguageTool-Funktionen des Argumentationsprüfers we
 `node tests/checks.cjs`
 
 Prüft gezielte Konsistenzregeln und Gegenfälle, Terminplanung, HTML-Escaping, lokale Speicherung und die vollständige Feldübernahme in Markdown und Word-Modell. GitHub Actions führt die Tests vor jeder Pages-Veröffentlichung aus. Der Word-Export wurde zusätzlich als DOCX erzeugt und visuell gerendert geprüft.
+
+## Feedback zu fehlenden Angaben
+
+Der Feedback-Button und die Schritt-Navigation zeigen die Zahl offener Basisangaben. Jedes Feld hat einen aktuellen Status; eine Zusammenfassung pro Schritt nennt die offenen Angaben und führt direkt zur Eingabe. Der Bericht unterscheidet leere Felder, Platzhalter, knappe Einträge, ungültige Datums-/Stundenangaben und nicht erkennbare Planungselemente. Eine vollständige Checkliste und Filter erleichtern die Überarbeitung. Das Feedback ist als Textdatei herunterladbar.
+
+Die Basis-Checkliste deckt alle Formularfelder und die Arbeitsphasen ab. Hypothese, Konsistenzreflexion und weitere Verpflichtungen sind optional und zählen bei leerem Inhalt nicht als fehlend. Platzhalter gelten nicht als ausgearbeiteter Inhalt. Sehr kurze Einträge lösen nur einen transparenten Wortzahlhinweis aus. Methodenbezogene Regeln prüfen beispielsweise Stichprobenumfang, Auswahlkriterien, Befragungsinstrumente, Gegenbefunde, Zuordnungszeilen zu Teilfragen und Abschnitte der Gliederung. Begriffe können anders formuliert sein; solche Hinweise sind keine Feststellung, dass ein Element fachlich zwingend fehlt. Schulische Vorgaben haben Vorrang. Der Fortschritt zählt Basisangaben mit Inhalt, keine Qualitätsmerkmale.
